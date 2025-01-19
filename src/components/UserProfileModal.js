@@ -68,7 +68,7 @@ const UserProfileModal = ({ show, onHide, user, onLogout, onLLMChange }) => {
 
   const loadUserFiles = useCallback(async () => {
     try {
-      const response = await fetch(`${config.API_BASE_URL}/designer/get_user_files`, {
+      const response = await fetch(`${config.API_BASE_URL}/designer/get_user_files/`, {
         ...fetchOptions(),
         method: 'GET',
       });
