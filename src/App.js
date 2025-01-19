@@ -23,8 +23,9 @@ import Button from 'react-bootstrap/Button';
 import Cookies from 'js-cookie';
 import LoginModal from './components/LoginModal';
 import UserProfileModal from './components/UserProfileModal';
-import LoadingModal from './components/LoadingModal'; // Import the LoadingModal component
-import WebSocketIndicator from './components/WebSocketIndicator'; // Import the WebSocketIndicator component
+import LoadingModal from './components/LoadingModal'; 
+import WebSocketIndicator from './components/WebSocketIndicator'; 
+import AboutModal from './components/AboutModal';
 import config from './config';
 
 const nodeTypes = {
@@ -49,6 +50,7 @@ function Flow() {
   const [showJsonFilesModal, setShowJsonFilesModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showAboutModal, setShowAboutModal] = useState(true); 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
@@ -501,7 +503,7 @@ function Flow() {
     } else {
       console.error('Invalid diagram data structure:', diagramData);
     }
-  }, [setEdges, setNodes, setCurrentDiagramName, setCurrentDiagramDescription]); // No dependencies needed since we only use setState functions which are stable
+  }, [setEdges, setNodes, setCurrentDiagramName, setCurrentDiagramDescription]); 
 
   const handleCreateCrewAI = useCallback((chatInput) => {
     setIsCreatingCrewAI(true);
@@ -1191,7 +1193,7 @@ function Flow() {
         onFileSelect={handleLoadDiagram}
         onImportDiagram={handleImportDiagram}
         onNewDiagram={handleNewDiagram}
-        hasCurrentDiagram={nodes.length > 1} // On vérifie s'il y a plus d'un nœud (car le nœud output est toujours présent)
+        hasCurrentDiagram={nodes.length > 1} 
       />
 
       <LoginModal
@@ -1212,6 +1214,8 @@ function Flow() {
         show={isCreatingCrewAI} 
         taskDescription={currentTaskDescription} 
       />
+
+      <AboutModal show={showAboutModal} handleClose={() => setShowAboutModal(false)} />
     </div>
   );
 }
