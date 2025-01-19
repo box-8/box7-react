@@ -15,6 +15,7 @@ const JsonFilesModal = ({
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileContent, setFileContent] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Memoize fetchOptions
   const fetchOptions = useMemo(() => ({
@@ -136,6 +137,42 @@ const JsonFilesModal = ({
     }
   };
 
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Vérifier que c'est un fichier JSON
+    if (!file.name.endsWith('.json')) {
+      alert('Veuillez sélectionner un fichier JSON');
+      return;
+    }
+
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await fetch(`${config.API_BASE_URL}/designer/upload-diagram`, {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de l\'upload');
+      }
+
+      const data = await response.json();
+      alert('Diagramme uploadé avec succès');
+      loadFiles(); // Recharger la liste des fichiers
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Erreur lors de l\'upload du fichier');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   return (
     <Modal 
       show={show} 
@@ -143,24 +180,37 @@ const JsonFilesModal = ({
       size="xl"
     >
       <Modal.Header closeButton>
-        <Modal.Title>Load Diagram</Modal.Title>
+        <Modal.Title>Gestionnaire de diagrammes</Modal.Title>
       </Modal.Header>
       <Modal.Body style={{ maxHeight: 'calc(90vh - 200px)', overflow: 'hidden' }}>
+        <div className="mb-3 d-flex justify-content-between">
+          <Button variant="primary" onClick={() => {
+            onNewDiagram();
+            handleClose();
+          }}>
+            Nouveau
+          </Button>
+          <div>
+            <input
+              type="file"
+              accept=".json"
+              style={{ display: 'none' }}
+              onChange={handleFileUpload}
+              id="json-file-upload"
+            />
+            <Button 
+              variant="outline-primary" 
+              onClick={() => document.getElementById('json-file-upload').click()}
+              disabled={isUploading}
+            >
+              {isUploading ? 'Upload en cours...' : 'Uploader un diagramme'}
+            </Button>
+          </div>
+        </div>
         <div className="row" style={{ height: '100%' }}>
           <div className="col-md-6" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             <div className="d-flex justify-content-between align-items-center mb-3">
               <h5 className="m-0">Available Diagrams</h5>
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={() => {
-                  handleClose();
-                  onNewDiagram();
-                }}
-                title="New Diagram"
-              >
-                <i className="bi bi-file-earmark-plus"></i> New
-              </Button>
             </div>
             <ListGroup 
               style={{ 
